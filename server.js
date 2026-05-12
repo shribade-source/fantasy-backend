@@ -10,6 +10,15 @@ app.get("/", (req, res) => {
   res.send("Fantasy backend is running ✅");
 });
 
+app.get("/players", async (req, res) => {
+  try {
+    const result = await pool.query("SELECT * FROM players");
+    res.json(result.rows);
+  } catch (error) {
+    res.status(500).send("Error fetching players");
+  }
+});
+
 // ✅ Replace with YOUR Supabase credentials
 const pool = new Pool({
   user: 'postgres',
