@@ -6,20 +6,7 @@ const app = express();
 app.use(cors());
 app.use(express.json());
 
-app.get("/", (req, res) => {
-  res.send("Fantasy backend is running ✅");
-});
-
-app.get("/players", async (req, res) => {
-  try {
-    const result = await pool.query("SELECT * FROM players");
-    res.json(result.rows);
-  } catch (error) {
-    res.status(500).send("Error fetching players");
-  }
-});
-
-// ✅ Replace with YOUR Supabase credentials
+// ✅ DATABASE CONNECTION (PUT THIS FIRST)
 const pool = new Pool({
   user: 'postgres',
   host: 'db.yoerzzektdkhmjaeshyb.supabase.co',
@@ -29,44 +16,23 @@ const pool = new Pool({
   ssl: { rejectUnauthorized: false }
 });
 
-// ✅ Test API
-app.get('/', (req, res) => {
+// ✅ ROOT TEST
+app.get("/", (req, res) => {
   res.send("Fantasy backend is running ✅");
 });
 
-// ✅ Get players
-app.get('/players', async (req, res) => {
-  const result = await pool.query('SELECT * FROM players');
-  res.json(result.rows);
+// ✅ PLAYERS API
+app.get("/players", async (req, res) => {
+  try {
+    const result = await pool.query("SELECT * FROM players");
+    res.json(result.rows);
+  } catch (error) {
+    console.log(error);
+    res.status(500).send("Error fetching players");
+  }
 });
 
-// ✅ Substitution count
-app.get('/subs/:userId', async (req, res) => {
-  const result = await pool.query(
-    'SELECT subs_left FROM users WHERE id=$1',
-    [req.params.userId]
-  );
-  res.json(result.rows[0]);
+// ✅ START SERVER
+app.listen(3001, () => {
+  console.log("Server running");
 });
-
-// ✅ Locks API
-app.get('/locks', async (req, res) => {
-  const usage = await pool.query('SELECT * FROM player_usage');
-
-  let locks = {};
-  let costs = {};
-
-  usage.rows.forEach(u => {
-    if (u.selected_count < 5 || u.captain_count > 0) {
-      locks[u.player_id] = true;
-    }
-
-    if (u.selected_count >= 5 && u.captain_count === 0) {
-      costs[u.player_id] = 10;
-    }
-  });
-
-  res.json({ locks, costs });
-});
-
-app.listen(3001, () => console.log("Server running"));
