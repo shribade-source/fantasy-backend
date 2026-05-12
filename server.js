@@ -6,6 +6,10 @@ const app = express();
 app.use(cors());
 app.use(express.json());
 
+app.get("/", (req, res) => {
+  res.send("Fantasy backend is running ✅");
+});
+
 // ✅ Replace with YOUR Supabase credentials
 const pool = new Pool({
   user: 'postgres',
