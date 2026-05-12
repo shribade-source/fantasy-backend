@@ -8,11 +8,8 @@ app.use(express.json());
 
 // ✅ DATABASE CONNECTION (PUT THIS FIRST)
 const pool = new Pool({
-  user: 'postgres',
-  host: 'db.yoerzzektdkhmjaeshyb.supabase.co',
-  database: 'postgres',
-  password: 'Superselector@2026',
-  port: 5432,
+const pool = new Pool({
+  connectionString: "postgresql://postgres.yoerzzektdkhmjaeshyb:Superselector%402026@aws-1-ap-northeast-1.pooler.supabase.com:6543/postgres",
   ssl: { rejectUnauthorized: false }
 });
 
