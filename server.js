@@ -6,10 +6,9 @@ const app = express();
 app.use(cors());
 app.use(express.json());
 
-// ✅ DATABASE CONNECTION (PUT THIS FIRST)
+// ✅ DATABASE CONNECTION (USING POOLER)
 const pool = new Pool({
-const pool = new Pool({
-  connectionString: "postgresql://postgres.yoerzzektdkhmjaeshyb:Superselector%402026@aws-1-ap-northeast-1.pooler.supabase.com:6543/postgres",
+  connectionString: "postgresql://postgres:Superselector%402026@aws-1-ap-northeast-1.pooler.supabase.com:6543/postgres",
   ssl: { rejectUnauthorized: false }
 });
 
@@ -22,15 +21,10 @@ app.get("/", (req, res) => {
 app.get("/players", async (req, res) => {
   try {
     const result = await pool.query("SELECT * FROM players");
-    console.log(result.rows);  // 👈 ADD THIS LINE
     res.json(result.rows);
   } catch (error) {
-    console.log(error);       // 👈 ADD THIS LINE
+    console.log("DB ERROR:", error);
     res.status(500).send("Error fetching players");
   }
 });
 
-// ✅ START SERVER
-app.listen(3001, () => {
-  console.log("Server running");
-});
