@@ -9,9 +9,9 @@ app.use(express.json());
 // ✅ Replace with YOUR Supabase credentials
 const pool = new Pool({
   user: 'postgres',
-  host: 'YOUR_SUPABASE_HOST',
+  host: 'db.yoerzzektdkhmjaeshyb.supabase.co',
   database: 'postgres',
-  password: 'YOUR_SUPABASE_PASSWORD',
+  password: 'Superselector@2026',
   port: 5432,
   ssl: { rejectUnauthorized: false }
 });
