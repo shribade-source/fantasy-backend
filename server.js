@@ -37,3 +37,28 @@ const PORT = process.env.PORT || 3001;
 app.listen(PORT, () => {
   console.log("Server running on port " + PORT);
 });
+
+app.get("/player-usage", async (req, res) => {
+  try {
+    const result = await pool.query("SELECT * FROM player_usage");
+    
+    let locks = {};
+    let costs = {};
+
+    result.rows.forEach(p => {
+      if (p.selected_count < 5 || p.captain_count > 0) {
+        locks[p.player_id] = true;
+      }
+
+      if (p.selected_count >= 5 && p.captain_count === 0) {
+        costs[p.player_id] = 10;
+      }
+    });
+
+    res.json({ locks, costs });
+
+  } catch (err) {
+    console.log(err);
+    res.send("error");
+  }
+});
