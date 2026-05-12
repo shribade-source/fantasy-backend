@@ -34,6 +34,35 @@ app.get("/players", async (req, res) => {
 
 // ✅ START SERVER (RENDER IMPORTANT)
 const PORT = process.env.PORT || 3001;
+
+app.get("/full-leaderboard", async (req, res) => {
+  try {
+    const users = await pool.query("SELECT * FROM users");
+    const teams = await pool.query("SELECT * FROM user_teams");
+    const scoresData = await pool.query("SELECT * FROM player_points");
+
+    // ✅ Build player score map
+    let playerScoreMap = {};
+
+    scoresData.rows.forEach(p => {
+      let score =
+        (p.runs || 0) +
+        (p.wickets || 0) * 25 +
+        (p.catches || 0) * 10;
+
+      if (p.runs >= 50) score += 5;
+      if (p.runs >= 100) score += 10;
+      if (p.wickets >= 3) score += 5;
+      if (p.wickets >= 5) score += 10;
+      if (p.runs === 0) score -= 5;
+
+      playerScoreMap[p.player_id] = score;
+    });
+
+    // ✅ Calculate each user score
+    let leaderboard = users.rows.map(user => {
+      let userPlayers = teams.rows.filter(t => t.user_id === user.id);
+
 app.listen(PORT, () => {
   console.log("Server running on port " + PORT);
 });
