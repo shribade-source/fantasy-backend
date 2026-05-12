@@ -25,9 +25,10 @@ app.get("/", (req, res) => {
 app.get("/players", async (req, res) => {
   try {
     const result = await pool.query("SELECT * FROM players");
+    console.log(result.rows);  // 👈 ADD THIS LINE
     res.json(result.rows);
   } catch (error) {
-    console.log(error);
+    console.log(error);       // 👈 ADD THIS LINE
     res.status(500).send("Error fetching players");
   }
 });
