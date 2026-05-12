@@ -62,3 +62,33 @@ app.get("/player-usage", async (req, res) => {
     res.send("error");
   }
 });
+
+app.get("/leaderboard", async (req, res) => {
+  try {
+    const players = await pool.query("SELECT * FROM player_points");
+
+    let scores = {};
+
+    players.rows.forEach(p => {
+      let score =
+        (p.runs || 0) * 1 +
+        (p.wickets || 0) * 25 +
+        (p.catches || 0) * 10;
+
+      if (p.runs >= 50) score += 5;
+      if (p.runs >= 100) score += 10;
+      if (p.wickets >= 3) score += 5;
+      if (p.wickets >= 5) score += 10;
+
+      if (p.runs === 0) score -= 5;
+
+      scores[p.player_id] = score;
+    });
+
+    res.json(scores);
+  } catch (err) {
+    console.log(err);
+    res.send("error leaderboard");
+  }
+});
+``
