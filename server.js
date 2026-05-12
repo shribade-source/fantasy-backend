@@ -8,7 +8,7 @@ app.use(express.json());
 
 // ✅ SAFE DB CONNECTION (using pooler)
 const pool = new Pool({
-  user: "postgres",
+  user: "postgres.yoerzzektdkhmjaeshyb",
   host: "aws-1-ap-northeast-1.pooler.supabase.com",
   database: "postgres",
   password: "Superselector@2026",
