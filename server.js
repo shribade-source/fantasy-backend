@@ -168,6 +168,36 @@ app.get("/user-team/:id", async (req, res) => {
   }
 });
 
+// ✅ UPDATE USER TEAM
+app.post("/update-team", async (req, res) => {
+  const { userId, players, captain, viceCaptain } = req.body;
+
+  try {
+    // ❌ remove old team
+    await pool.query("DELETE FROM user_teams WHERE user_id = $1", [userId]);
+
+    // ✅ insert new team
+    for (let p of players) {
+      await pool.query(
+        `INSERT INTO user_teams (user_id, player_id, is_captain, is_vice)
+         VALUES ($1, $2, $3, $4)`,
+        [
+          userId,
+          p.id,
+          captain === p.id,
+          viceCaptain === p.id
+        ]
+      );
+    }
+
+    res.send("✅ Team updated successfully");
+
+  } catch (err) {
+    console.error(err);
+    res.send("Error updating team");
+  }
+});
+
 
 // ✅ START SERVER
 const PORT = process.env.PORT || 3001;
