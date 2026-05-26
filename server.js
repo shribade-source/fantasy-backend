@@ -110,6 +110,17 @@ app.get("/full-leaderboard", async (req, res) => {
   }
 });
 
+// ✅ GET USERS
+app.get("/users", async (req, res) => {
+  try {
+    const result = await pool.query("SELECT * FROM users");
+    res.json(result.rows);
+  } catch (err) {
+    console.error(err);
+    res.send("Error fetching users");
+  }
+});
+
 // ✅ START SERVER
 const PORT = process.env.PORT || 3001;
 app.listen(PORT, () => {
