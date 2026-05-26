@@ -121,6 +121,54 @@ app.get("/users", async (req, res) => {
   }
 });
 
+// ✅ GET USER TEAM
+app.get("/user-team/:id", async (req, res) => {
+  const userId = req.params.id;
+
+  try {
+    // get team rows
+    const team = await pool.query(
+      "SELECT * FROM user_teams WHERE user_id = $1",
+      [userId]
+    );
+
+    // get all players
+    const players = await pool.query("SELECT * FROM players");
+
+    // map player details
+    const playerMap = {};
+    players.rows.forEach(p => {
+      playerMap[p.id] = p;
+    });
+
+    let teamPlayers = [];
+    let captain = null;
+    let viceCaptain = null;
+
+    team.rows.forEach(t => {
+      const player = playerMap[t.player_id];
+
+      if (player) {
+        teamPlayers.push(player);
+
+        if (t.is_captain) captain = player.id;
+        if (t.is_vice) viceCaptain = player.id;
+      }
+    });
+
+    res.json({
+      players: teamPlayers,
+      captain,
+      viceCaptain
+    });
+
+  } catch (err) {
+    console.error(err);
+    res.send("Error fetching team");
+  }
+});
+
+
 // ✅ START SERVER
 const PORT = process.env.PORT || 3001;
 app.listen(PORT, () => {
