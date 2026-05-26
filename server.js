@@ -124,35 +124,46 @@ app.get("/users", async (req, res) => {
 // ✅ GET USER TEAM
 app.get("/user-team/:id", async (req, res) => {
   const userId = req.params.id;
+  const stage = req.query.stage;
 
   try {
-    // get team rows
+    // ✅ get latest available team
     const team = await pool.query(
-      "SELECT * FROM user_teams WHERE user_id = $1",
-      [userId]
+      `SELECT * FROM user_teams 
+       WHERE user_id = $1 AND stage <= $2
+       ORDER BY stage DESC`,
+      [userId, stage]
     );
 
-    // get all players
+    if (team.rows.length === 0) {
+      return res.json({ players: [], captain: null, viceCaptain: null });
+    }
+
+    // ✅ get players list
     const players = await pool.query("SELECT * FROM players");
 
-    // map player details
     const playerMap = {};
     players.rows.forEach(p => {
       playerMap[p.id] = p;
     });
 
+    let usedStage = team.rows[0].stage;
+
+    // ✅ filter only that stage
+    const latestTeam = team.rows.filter(t => t.stage === usedStage);
+
     let teamPlayers = [];
     let captain = null;
     let viceCaptain = null;
 
-    team.rows.forEach(t => {
-      const player = playerMap[t.player_id];
+    latestTeam.forEach(t => {
+      const p = playerMap[t.player_id];
 
-      if (player) {
-        teamPlayers.push(player);
+      if (p) {
+        teamPlayers.push(p);
 
-        if (t.is_captain) captain = player.id;
-        if (t.is_vice) viceCaptain = player.id;
+        if (t.is_captain) captain = p.id;
+        if (t.is_vice) viceCaptain = p.id;
       }
     });
 
